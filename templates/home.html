@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hotel ERP</title>
+    <link
+      href="{{ url_for('static', path='css/style.css') }}"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="header">
+      <div class="sub-header">
+        <img
+          src="{{ url_for('static', path='assets/menu.svg') }}"
+          alt="Example Image"
+        />
+        <h1>Dashboard</h1>
+      </div>
+      <div class="search">
+        <input type="search" />
+      </div>
+      <div class="nav-list">
+        <img
+          src="{{ url_for('static', path='assets/hospital.svg') }}"
+          alt="Example Image"
+        />
+        <img
+          src="{{ url_for('static', path='assets/hotel.svg') }}"
+          alt="Example Image"
+        />
+        <img
+          src="{{ url_for('static', path='assets/cup.svg') }}"
+          alt="Example Image"
+        />
+        <img
+          src="{{ url_for('static', path='assets/house.svg') }}"
+          alt="Example Image"
+        />
+        <img
+          src="{{ url_for('static', path='assets/user.svg') }}"
+          alt="Example Image"
+        />
+      </div>
+    </div>
+    <section class="main">
+      {% include "form.html" %}
+      <div class="body">
+        <div class="sub-title">
+          <h1>Expenses Voucher</h1>
+          <button onclick="openModal()">Add Expenses</button>
+        </div>
+        <div class="hr"></div>
+        <div class="table">
+          <div class="tool">
+            <div class="filter">
+              <p>show</p>
+              <select>
+                <option>5</option>
+                <option>10</option>
+              </select>
+              <p>entries</p>
+            </div>
+            <div class="search">
+              <p>search</p>
+              <input type="search" />
+            </div>
+          </div>
+        </div>
+        <table>
+          <tr class="table-head">
+            <th>
+              <input type="checkbox" />
+            </th>
+            <th>Expenses Name</th>
+            <th>Date</th>
+            <th>Quality</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Action</th>
+          </tr>
+          {% for new_expanses in new_expanses%}
+          <tr class="table-row">
+            <td>
+              <input type="checkbox" />
+            </td>
+            <td>{{new_expanses.expense_name}}</td>
+            <td>{{new_expanses.date}}</td>
+            <td>{{new_expanses.quantity}}</td>
+            <td>{{new_expanses.price}}</td>
+            <td>{{new_expanses.description}}</td>
+            <td>
+              <button class="action-button"></button>
+              <button
+                class="action-button"
+                onclick="editForm({{
+                  new_expanses.id
+              }})"
+              ></button>
+              <button
+                class="action-button-delete"
+                onclick="deleteAction({{new_expanses.id}})"
+              ></button>
+            </td>
+          </tr>
+          {% endfor %}
+        </table>
+        <div class="page_no">
+          <p>Showing 1 to 2 of 2 entries</p>
+          <div class="page_no_container">
+            <button class="empty_page_no_button"></button>
+            <button class="current_page_no">1</button>
+            <button class="empty_page_no_button"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <script>
+      async function deleteAction(id) {
+        const response = await fetch(`/delete_expense/${id}`, {
+          method: "DELETE",
+        });
+        console.log(response);
+        window.location.reload();
+      }
+      async function editForm(id) {
+        const response = await fetch(`/edit_expense_form/${id}`, {
+          method: "POST",
+        });
+        const data = await response.json();
+        if (data) {
+          console.log(data);
+          openModal();
+          const edit = (document.getElementById("form_name").innerHTML =
+            "Edit Expenses");
+          console.log(edit);
+          document.getElementById("form").setAttribute("method", "POST"); // Set to POST initially
+          document.getElementById("form").action = `/edit_expense/${id}`;
+          document.getElementById("expense_name").value = data.expense_name;
+          document.getElementById("date").value = data.date;
+          document.getElementById("quantity").value = data.quantity;
+          document.getElementById("price").value = data.price;
+          document.getElementById("description").value = data.description;
+
+          // Manually submit the form with the desired method (PUT)
+          if (edit === "Edit Expenses") {
+            document
+              .getElementById("form")
+              .addEventListener("submit", async function (event) {
+                event.preventDefault();
+                const putResponse = await fetch(`/edit_expense/${id}`, {
+                  method: "PUT",
+                  body: new FormData(event.target),
+                });
+                console.log(putResponse);
+                window.location.reload();
+              });
+          } else if (edit === "Add Expenses") {
+            document
+              .getElementById("form")
+              .addEventListener("submit", async function (event) {
+                event.preventDefault();
+                const postResponse = await fetch(`/add_expense`, {
+                  method: "POST",
+                  body: new FormData(event.target),
+                });
+                console.log(postResponse);
+                window.location.reload();
+              });
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
