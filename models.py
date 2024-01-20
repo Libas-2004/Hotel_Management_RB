@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String
 from database import Base,db_engine
 
-class Item(Base):
+class Item(Base): # Create a database model for the items table
     __tablename__ = "items"
     id = Column(Integer, primary_key=True, index=True)
     expense_name = Column(String(255), index=True)

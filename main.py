@@ -2,18 +2,18 @@ from fastapi import FastAPI,Request,Depends,Form
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse,JSONResponse
-from database import SessionLocal
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
-# from models import base
-from crud import create_item,delete_item
-import models
 
-app=FastAPI()
-templates = Jinja2Templates(directory='templates')
-app.mount("/templates/static",StaticFiles(directory="templates/static"), name="static")
+from crud import create_item,delete_item # Import the CRUD operations we created
+from database import SessionLocal # Import the database session we created
+import models # Import the database models we created
 
-def get_db():
+app=FastAPI() # Create a FastAPI instance
+templates = Jinja2Templates(directory='templates') # Create a Jinja2Templates object and set the directory to the templates folder
+app.mount("/templates/static",StaticFiles(directory="templates/static"), name="static") # Mount the static files folder to the templates/static folder
+
+def get_db(): # Create a dependency function that will return the database session
     db = None
     try:
         db = SessionLocal()
@@ -22,13 +22,13 @@ def get_db():
         db.close()
 
 #Get The Template Home Page
-@app.get('/') 
+@app.get('/')  # get the home page of the application and render the home.html template
 def get_home(request:Request,db:Session = Depends(get_db)):
     new_expanses = db.query(models.Item).all()
     return templates.TemplateResponse("home.html",context={"request":request,"new_expanses":new_expanses})
 
 # Create a new expense
-@app.post('/create_expense')
+@app.post('/create_expense')# Create a new expense and redirect to the home page
 async def create_expense(
         request: Request,
         expense_name: str = Form(...),
@@ -39,7 +39,7 @@ async def create_expense(
         db: Session = Depends(get_db)  # Use the dependency to get the database session
 ):
     item = create_item(db=db, expense_name=expense_name, date=date, quantity=quantity, price=price, description=description)
-    return RedirectResponse(url='/',status_code=303)
+    return RedirectResponse(url='/',status_code=303) # redirect to the home page
 
 # Delete an expense
 @app.delete('/delete_expense/{id}')
@@ -49,9 +49,7 @@ async def delete_expense(
         db: Session = Depends(get_db)  # Use the dependency to get the database session
 ):
     item = delete_item(db=db, id=id)
-    new_expanses = db.query(models.Item).all()
     return jsonable_encoder(item)
-    # return templates.TemplateResponse("home.html",context={"request":request,"new_expanses":new_expanses})
 
 # Edit form for an expense
 @app.post('/edit_expense_form/{id}')
@@ -76,6 +74,6 @@ async def edit_expense(
         description: str = Form(...),
         db: Session = Depends(get_db)  # Use the dependency to get the database session
 ):
-    item = delete_item(db=db, id=id)
-    item = create_item(db=db, expense_name=expense_name, date=date, quantity=quantity, price=price, description=description)
+    delete_item(db=db, id=id)
+    create_item(db=db, expense_name=expense_name, date=date, quantity=quantity, price=price, description=description)
     return RedirectResponse(url='/',status_code=303)

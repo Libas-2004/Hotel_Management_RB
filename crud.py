@@ -1,6 +1,5 @@
 from sqlalchemy.orm import Session
-from database import Base
-from models import Item
+from models import Item # Import the Item model we created
 
 # Create an item
 def create_item(db: Session, expense_name: str, date: str, quantity: int, price: int, description: str):
@@ -12,7 +11,7 @@ def create_item(db: Session, expense_name: str, date: str, quantity: int, price:
 
 # Delete an item
 def delete_item(db: Session, id: int):
-    db_item = db.query(Item).filter(Item.id == id).first()
+    db_item = db.query(Item).filter(Item.id == id).first() # Get the item from the database with the id passed in the url
     db.delete(db_item)
     db.commit()
     return db_item
