@@ -45,7 +45,7 @@
       </div>
     </div>
     <section class="main">
-      {% include "form.html" %}
+      {% include "form.html" %} {% include "view.html" %}
       <div class="body">
         <div class="sub-title">
           <h1>Expenses Voucher</h1>
@@ -91,7 +91,12 @@
             <td>{{new_expanses.price}}</td>
             <td>{{new_expanses.description}}</td>
             <td>
-              <button class="action-button"></button>
+              <button
+                class="action-button"
+                onclick="viewForm({{
+                new_expanses.id
+            }})"
+              ></button>
               <button
                 class="action-button"
                 onclick="editForm({{

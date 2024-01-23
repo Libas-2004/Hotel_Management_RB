@@ -22,7 +22,7 @@ def get_db(): # Create a dependency function that will return the database sessi
         db.close()
 
 #Get The Template Home Page
-@app.get('/')  # get the home page of the application and render the home.html template
+@app.get('/getform')  # get the home page of the application and render the home.html template
 def get_home(request:Request,db:Session = Depends(get_db)):
     new_expanses = db.query(models.Item).all()
     return templates.TemplateResponse("home.html",context={"request":request,"new_expanses":new_expanses})
@@ -39,7 +39,7 @@ async def create_expense(
         db: Session = Depends(get_db)  # Use the dependency to get the database session
 ):
     item = create_item(db=db, expense_name=expense_name, date=date, quantity=quantity, price=price, description=description)
-    return RedirectResponse(url='/',status_code=303) # redirect to the home page
+    return RedirectResponse(url='/getform',status_code=303) # redirect to the home page
 
 # Delete an expense
 @app.delete('/delete_expense/{id}')
@@ -76,4 +76,4 @@ async def edit_expense(
 ):
     delete_item(db=db, id=id)
     create_item(db=db, expense_name=expense_name, date=date, quantity=quantity, price=price, description=description)
-    return RedirectResponse(url='/',status_code=303)
+    return RedirectResponse(url='/getform',status_code=303)
