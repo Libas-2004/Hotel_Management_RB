@@ -142,7 +142,7 @@
               <input
                 class="input"
                 type="text"
-                id="expense_name"
+                id="expense_nameview"
                 name="expense_name"
                 required
                 placeholder="Expense Name"
@@ -155,7 +155,7 @@
               <input
                 class="input"
                 type="text"
-                id="date"
+                id="dateview"
                 name="date"
                 required
                 placeholder="Date"
@@ -171,7 +171,7 @@
               <input
                 class="input"
                 type="text"
-                id="quantity"
+                id="quantityview"
                 name="quantity"
                 required
                 placeholder="Quantity"
@@ -183,7 +183,7 @@
               <input
                 class="input"
                 type="text"
-                id="price"
+                id="priceview"
                 name="price"
                 required
                 placeholder="price"
@@ -198,7 +198,7 @@
             <textarea
               class="input"
               type="text"
-              id="description"
+              id="descriptionview"
               name="description"
               required
               placeholder="description"
@@ -223,31 +223,13 @@
 
     <script>
       // JavaScript function to open the modal and optionally pre-fill data
-      function viewopenModal(id) {
+      function viewopenModal() {
         document.getElementById("viewmodal").style.display = "flex";
       }
 
       function viewcloseModal() {
         document.getElementById("viewmodal").style.display = "none";
         window.location.reload();
-      }
-
-      async function viewForm(id) {
-        if (id) {
-          const response = await fetch(/edit_expense_form/${id}, {
-            method: "POST",
-          });
-          const data = await response.json();
-          if (data) {
-            console.log(data);
-            viewopenmodal();
-            document.getElementById("expense_name").value = data.expense_name;
-            document.getElementById("date").value = data.date;
-            document.getElementById("quantity").value = data.quantity;
-            document.getElementById("price").value = data.price;
-            document.getElementById("description").value = data.description;
-          }
-        }
       }
     </script>
   </body>

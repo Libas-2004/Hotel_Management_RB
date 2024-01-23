@@ -176,6 +176,24 @@
           }
         }
       }
+      async function viewForm(id) {
+        if (id) {
+          const response = await fetch(`/edit_expense_form/${id}`, {
+            method: "POST",
+          });
+          const data = await response.json();
+          if (data) {
+            console.log(data);
+            viewopenModal(); // Corrected function name to viewopenModal
+            document.getElementById("expense_nameview").value =
+              data.expense_name;
+            document.getElementById("dateview").value = data.date;
+            document.getElementById("quantityview").value = data.quantity;
+            document.getElementById("priceview").value = data.price;
+            document.getElementById("descriptionview").value = data.description;
+          }
+        }
+      }
     </script>
   </body>
 </html>
