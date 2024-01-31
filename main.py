@@ -71,9 +71,21 @@ async def edit_expense(
         date: str = Form(...),
         quantity: int = Form(...),
         price: int = Form(...),
-        description: str = Form(...),
+        description: str = Form(...),           
         db: Session = Depends(get_db)  # Use the dependency to get the database session
 ):
     delete_item(db=db, id=id)
     create_item(db=db, expense_name=expense_name, date=date, quantity=quantity, price=price, description=description)
     return RedirectResponse(url='/getform',status_code=303)
+
+#for search
+@app.get('/search_expens/{name}')
+async def search_expens(
+        request: Request,
+        name: str,
+        db: Session = Depends(get_db)  # Use the dependency to get the database session
+):
+    item = db.query(models.Item).having(models.Item.expense_name == name).first()   
+    if item is None:
+        return JSONResponse(status_code=404,content={"message":"item not found"})
+    return jsonable_encoder(item)   
