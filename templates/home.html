@@ -64,7 +64,7 @@
             </div>
             <div class="search">
               <p>search</p>
-              <input type="search" />
+              <input type="search" id="searchInput" />
             </div>
           </div>
         </div>
@@ -135,7 +135,7 @@
         });
         const data = await response.json();
         if (data) {
-          // console.log(data);
+          //  console.log(data);
           openModal();
           const edit = (document.getElementById("form_name").innerHTML =
             "Edit Expenses");
@@ -194,6 +194,27 @@
           }
         }
       }
+
+      function filterTableRows() {
+        const searchValue = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+
+        const rows = document.querySelectorAll(".table-row");
+
+        rows.forEach((row) => {
+          const rowData = row.textContent.toLowerCase();
+          if (rowData.includes(searchValue)) {
+            row.style.display = ""; // Show row
+          } else {
+            row.style.display = "none"; // Hide row
+          }
+        });
+      }
+      // Get the input field
+      document
+        .getElementById("searchInput")
+        .addEventListener("input", filterTableRows);
     </script>
   </body>
 </html>
