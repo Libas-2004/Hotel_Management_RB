@@ -25,7 +25,9 @@ def get_db(): # Create a dependency function that will return the database sessi
 async def add_header(request: Request, call_next):
     protected_routes = ["/getform","/create_expense","/delete_expense","/edit_expense_form","/edit_expense","/search_expens"]
     if request.url.path in protected_routes:
-       request.headers = {"Authorization ": "Bearer token"}
+        email = request.cookies.get("email")
+        if email is None:
+            return JSONResponse(status_code=401,content={"message":"Unauthorized"})
     response = await call_next(request)
     response.headers["Access-Control-Allow-Origin"] = "*"
     return response
@@ -46,7 +48,9 @@ async def signup(
     user = models.User(username=username,email=email, password=password)
     db.add(user)
     db.commit()
-    return RedirectResponse(url='/getform',status_code=303) # redirect to the home page
+    response = RedirectResponse(url='/getform', status_code=303)
+    response.set_cookie(key="email", value=email)
+    return response 
 
 @app.get('/login')  # get the home page of the application and render the login.html template
 def get_login(request:Request):
@@ -64,7 +68,9 @@ async def login(
         return JSONResponse(status_code=404,content={"message":"user not found"})
     if user.password != password:
         return JSONResponse(status_code=404,content={"message":"password is incorrect"})
-    return RedirectResponse(url='/getform',status_code=303)
+    response = RedirectResponse(url='/getform', status_code=303)
+    response.set_cookie(key="email", value=email)
+    return response 
 
 #Get The Template Home Page
 @app.get('/getform')  # get the home page of the application and render the home.html template

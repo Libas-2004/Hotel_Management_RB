@@ -9,6 +9,13 @@
       rel="stylesheet"
     />
   </head>
+  <style>
+    .logout {
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
   <body>
     <div class="header">
       <div class="sub-header">
@@ -38,10 +45,13 @@
           src="{{ url_for('static', path='assets/house.svg') }}"
           alt="Example Image"
         />
-        <img
-          src="{{ url_for('static', path='assets/user.svg') }}"
-          alt="Example Image"
-        />
+        <button class="logout" onclick="clearCookies()">
+          <img
+            src="{{ url_for('static', path='assets/user.svg') }}"
+            alt="Example Image"
+            title="logout"
+          />
+        </button>
       </div>
     </div>
     <section class="main">
@@ -215,6 +225,11 @@
       document
         .getElementById("searchInput")
         .addEventListener("input", filterTableRows);
+
+      function clearCookies() {
+        document.cookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+        window.location.href = "/";
+      }
     </script>
   </body>
 </html>
