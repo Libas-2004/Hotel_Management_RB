@@ -21,6 +21,51 @@ def get_db(): # Create a dependency function that will return the database sessi
     finally:
         db.close()
 
+@app.middleware("http") # Create a middleware that will add a header to all responses
+async def add_header(request: Request, call_next):
+    protected_routes = ["/getform","/create_expense","/delete_expense","/edit_expense_form","/edit_expense","/search_expens"]
+    if request.url.path in protected_routes:
+       request.headers = {"Authorization ": "Bearer token"}
+    response = await call_next(request)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
+    
+
+@app.get('/')  # get the home page of the application and render the signup.html template
+def get_home(request:Request):
+    return templates.TemplateResponse("signup.html",context={"request":request})
+
+@app.post('/signup')  # Create a new user and redirect to the home page
+async def signup(
+        request: Request,
+        username: str = Form(...),
+        email: str = Form(...),
+        password: str = Form(...),
+        db: Session = Depends(get_db)  # Use the dependency to get the database session
+):
+    user = models.User(username=username,email=email, password=password)
+    db.add(user)
+    db.commit()
+    return RedirectResponse(url='/getform',status_code=303) # redirect to the home page
+
+@app.get('/login')  # get the home page of the application and render the login.html template
+def get_login(request:Request):
+    return templates.TemplateResponse("login.html",context={"request":request})
+
+@app.post('/login')  # get the home page of the application and render the login.html template
+async def login(
+    request: Request,
+    email:str = Form(...),
+    password:str = Form(...),
+    db: Session = Depends(get_db)  # Use the dependency to get the database session
+):
+    user = db.query(models.User).filter(models.User.email == email).first()
+    if user is None:
+        return JSONResponse(status_code=404,content={"message":"user not found"})
+    if user.password != password:
+        return JSONResponse(status_code=404,content={"message":"password is incorrect"})
+    return RedirectResponse(url='/getform',status_code=303)
+
 #Get The Template Home Page
 @app.get('/getform')  # get the home page of the application and render the home.html template
 def get_home(request:Request,db:Session = Depends(get_db)):
